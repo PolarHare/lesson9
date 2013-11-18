@@ -40,4 +40,7 @@ public class FIODaily {
 		return this.daily == null ? -1 : this.daily.datablockSize();
 	}
 
+    public FIODataBlock getDaily() {
+        return daily;
+    }
 }

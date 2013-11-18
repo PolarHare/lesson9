@@ -4,7 +4,6 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,7 +27,7 @@ public class ForecastForCity {
     private City city;
 
     @DatabaseField()
-    private Date downloadedAt;
+    private long downloadedAt;
     @DatabaseField()
     private ForecastData current;
     @DatabaseField()
@@ -36,10 +35,84 @@ public class ForecastForCity {
     @ForeignCollectionField(eager = true)
     private List<ForecastData> hours;
     @DatabaseField()
-    private String gaysSummary;
+    private String daysSummary;
     @ForeignCollectionField(eager = true)
     private List<ForecastData> days;
 
     public ForecastForCity() {
+    }
+
+    public ForecastForCity(City city, long downloadedAt, ForecastData current, String hoursSummary, List<ForecastData> hours, String daysSummary, List<ForecastData> days) {
+        this.city = city;
+        this.downloadedAt = downloadedAt;
+        this.current = current;
+        this.hoursSummary = hoursSummary;
+        this.hours = hours;
+        this.daysSummary = daysSummary;
+        this.days = days;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
+    }
+
+    public long getDownloadedAt() {
+        return downloadedAt;
+    }
+
+    public void setDownloadedAt(long downloadedAt) {
+        this.downloadedAt = downloadedAt;
+    }
+
+    public ForecastData getCurrent() {
+        return current;
+    }
+
+    public void setCurrent(ForecastData current) {
+        this.current = current;
+    }
+
+    public String getHoursSummary() {
+        return hoursSummary;
+    }
+
+    public void setHoursSummary(String hoursSummary) {
+        this.hoursSummary = hoursSummary;
+    }
+
+    public List<ForecastData> getHours() {
+        return hours;
+    }
+
+    public void setHours(List<ForecastData> hours) {
+        this.hours = hours;
+    }
+
+    public String getDaysSummary() {
+        return daysSummary;
+    }
+
+    public void setDaysSummary(String daysSummary) {
+        this.daysSummary = daysSummary;
+    }
+
+    public List<ForecastData> getDays() {
+        return days;
+    }
+
+    public void setDays(List<ForecastData> days) {
+        this.days = days;
     }
 }

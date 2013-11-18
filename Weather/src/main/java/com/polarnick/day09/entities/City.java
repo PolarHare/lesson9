@@ -26,4 +26,44 @@ public class City {
 
     public City() {
     }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public ForecastForCity getForecast() {
+        return forecast;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setForecast(ForecastForCity forecast) {
+        this.forecast = forecast;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }

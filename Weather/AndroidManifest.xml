@@ -9,10 +9,9 @@
             android:targetSdkVersion="16"/>
 
     <application
-            android:icon="@drawable/rss_icon"
-            android:label="Weather"
-            android:theme="@android:style/Theme.NoTitleBar">
-        <activity android:name=".WeatherActivity">
+            android:icon="@drawable/weather_icon"
+            android:label="Weather">
+        <activity android:name=".weather.WeatherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

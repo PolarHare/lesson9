@@ -39,4 +39,7 @@ public class FIOHourly {
 		return this.hourly == null ? -1 : this.hourly.datablockSize();
 	}
 
+    public FIODataBlock getHourly() {
+        return hourly;
+    }
 }

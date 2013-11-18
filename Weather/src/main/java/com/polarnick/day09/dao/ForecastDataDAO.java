@@ -17,8 +17,4 @@ public class ForecastDataDAO extends BaseDaoImpl<ForecastData, Integer> {
     protected ForecastDataDAO(ConnectionSource connectionSource, Class<ForecastData> dataClass) throws SQLException {
         super(connectionSource, dataClass);
     }
-
-    public List<ForecastData> getAllCities() throws SQLException {
-        return this.queryForAll();
-    }
 }

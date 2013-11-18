@@ -1,1 +1,0 @@
-mvn install:install-file -DgroupId=dme.forecastiolib -DartifactId=ForecastIO -Dversion=1.0 -Dpackaging=jar -Dfile=Weather/lib/forecastio-lib-java.jar -DgeneratePom=true

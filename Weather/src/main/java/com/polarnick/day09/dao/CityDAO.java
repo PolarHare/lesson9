@@ -1,5 +1,6 @@
 package com.polarnick.day09.dao;
 
+import android.util.Log;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 import com.polarnick.day09.entities.City;
@@ -18,7 +19,12 @@ public class CityDAO extends BaseDaoImpl<City, Integer> {
         super(connectionSource, dataClass);
     }
 
-    public List<City> getAllCities() throws SQLException {
-        return this.queryForAll();
+    public synchronized List<City> getAllCities() {
+        try {
+            return this.queryForAll();
+        } catch (SQLException e) {
+            Log.e(CityDAO.class.getName(), "Error getting all cities!");
+            throw new RuntimeException(e);
+        }
     }
 }
