@@ -3,19 +3,21 @@ package com.polarnick.day09.entities;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.io.Serializable;
+
 /**
  * Date: 18.11.13
  *
  * @author Nickolay Polyarniy aka PolarNick
  */
 @DatabaseTable(tableName = "cities")
-public class City {
+public class City implements Serializable {
 
     @DatabaseField(generatedId = true)
     private int id;
 
     @DatabaseField(foreign = true)
-    private ForecastForCity forecast;
+    private transient ForecastForCity forecast;
 
     @DatabaseField()
     private String name;

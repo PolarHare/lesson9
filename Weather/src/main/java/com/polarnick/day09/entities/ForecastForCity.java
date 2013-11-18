@@ -4,6 +4,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -28,16 +29,16 @@ public class ForecastForCity {
 
     @DatabaseField()
     private long downloadedAt;
-    @DatabaseField()
+    @DatabaseField(foreign = true)
     private ForecastData current;
     @DatabaseField()
     private String hoursSummary;
     @ForeignCollectionField(eager = true)
-    private List<ForecastData> hours;
+    private Collection<ForecastData> hours;
     @DatabaseField()
     private String daysSummary;
     @ForeignCollectionField(eager = true)
-    private List<ForecastData> days;
+    private Collection<ForecastData> days;
 
     public ForecastForCity() {
     }
@@ -92,7 +93,7 @@ public class ForecastForCity {
         this.hoursSummary = hoursSummary;
     }
 
-    public List<ForecastData> getHours() {
+    public Collection<ForecastData> getHours() {
         return hours;
     }
 
@@ -108,7 +109,7 @@ public class ForecastForCity {
         this.daysSummary = daysSummary;
     }
 
-    public List<ForecastData> getDays() {
+    public Collection<ForecastData> getDays() {
         return days;
     }
 

@@ -19,8 +19,8 @@ public class CitiesProvider {
 
     private static final Geocoder geocoder = new Geocoder();
 
-    public static synchronized List<City> getCities(String address) {
-        List<City> cities = new ArrayList<City>();
+    public static synchronized ArrayList<City> getCities(String address) {
+        ArrayList<City> cities = new ArrayList<City>();
         GeocoderRequest geocoderRequest = new GeocoderRequestBuilder().setAddress(address).getGeocoderRequest();
         GeocodeResponse geocoderResponse = geocoder.geocode(geocoderRequest);
         for (GeocoderResult geocoderResult : geocoderResponse.getResults()) {
