@@ -2,6 +2,7 @@ package com.polarnick.day09.dao;
 
 import android.util.Log;
 import com.j256.ormlite.dao.BaseDaoImpl;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.polarnick.day09.entities.City;
 import com.polarnick.day09.entities.ForecastForCity;

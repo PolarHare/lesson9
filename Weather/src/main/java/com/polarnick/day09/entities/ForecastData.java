@@ -28,6 +28,8 @@ public class ForecastData {
     @DatabaseField(foreign = true)
     private ForecastForCity forecastForCity;
 
+    @DatabaseField
+    private boolean isHour;
     @DatabaseField()
     private String summary;
     @DatabaseField()
@@ -214,5 +216,13 @@ public class ForecastData {
 
     public void setWindBearing(int windBearing) {
         this.windBearing = windBearing;
+    }
+
+    public boolean isHour() {
+        return isHour;
+    }
+
+    public void setHour(boolean hour) {
+        isHour = hour;
     }
 }

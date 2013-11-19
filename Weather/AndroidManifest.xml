@@ -11,13 +11,15 @@
     <application
             android:icon="@drawable/weather_icon"
             android:label="Weather">
-        <activity android:name=".cities.CitiesManagementActivity">
+        <activity android:name=".weather.WeatherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".cities.CitiesManagementActivity"/>
         <activity android:name=".cities.CityChoiseActivity"/>
+        <service android:name=".weather.WeatherUpdaterService"/>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET"/>

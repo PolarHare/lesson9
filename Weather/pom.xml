@@ -76,6 +76,12 @@
             <artifactId>ormlite-android</artifactId>
             <version>4.47</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.google.android</groupId>
+            <artifactId>support-v4</artifactId>
+            <version>r6</version>
+        </dependency>
     </dependencies>
 
 </project>

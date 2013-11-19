@@ -11,6 +11,8 @@ import android.widget.TextView;
 import com.polarnick.day09.R;
 import com.polarnick.day09.dao.DatabaseHelperFactory;
 import com.polarnick.day09.entities.City;
+import com.polarnick.day09.entities.ForecastData;
+import com.polarnick.day09.entities.ForecastForCity;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -34,6 +36,15 @@ public class CityListAdapter extends ArrayAdapter<City> {
             public void onClick(View v) {
                 City city = (City) v.getTag();
                 try {
+                    ForecastForCity forecastForCity = city.getForecast();
+                    if (forecastForCity != null) {
+                        DatabaseHelperFactory.getHelper().getForecastForCityDAO().refresh(forecastForCity);
+                        DatabaseHelperFactory.getHelper().getForecastDataDAO().delete(forecastForCity.getCurrent());
+                        for (ForecastData forecastData : forecastForCity.getData()) {
+                            DatabaseHelperFactory.getHelper().getForecastDataDAO().delete(forecastData);
+                        }
+                        DatabaseHelperFactory.getHelper().getForecastForCityDAO().delete(forecastForCity);
+                    }
                     DatabaseHelperFactory.getHelper().getCityDAO().deleteById(city.getId());
                 } catch (SQLException e) {
                     Log.e(CityListAdapter.class.getName(), "Deleting city with name=" + city.getName() + " and id=" + city.getId() + " failed!");

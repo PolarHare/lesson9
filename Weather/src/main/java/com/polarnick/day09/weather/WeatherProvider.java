@@ -11,8 +11,6 @@ import com.polarnick.day09.entities.ForecastData;
 import com.polarnick.day09.entities.ForecastForCity;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Date: 18.11.13
@@ -29,32 +27,48 @@ public class WeatherProvider {
     }
 
     public static synchronized ForecastForCity getForecastForCity(City city) {
-        ForecastForCity newForecastForCity = new ForecastForCity();
-        newForecastForCity.setCity(city);
-        newForecastForCity.setDownloadedAt(System.currentTimeMillis());
+        try {
+            ForecastForCity newForecastForCity = new ForecastForCity();
+            DatabaseHelperFactory.getHelper().getForecastForCityDAO().create(newForecastForCity);
 
-        FIO.getForecast(city.getLatitude(), city.getLongitude());
-        newForecastForCity.setCurrent(new ForecastData(new FIOCurrently(FIO).get()));
+            newForecastForCity.setCity(city);
+            newForecastForCity.setDownloadedAt(System.currentTimeMillis());
 
-        final FIODaily fioDaily = new FIODaily(FIO);
-        newForecastForCity.setDaysSummary(fioDaily.getDaily().summary());
-        List<ForecastData> days = new ArrayList<ForecastData>(ForecastForCity.DAYS_COUNT);
-        for (int i = 0; i < ForecastForCity.DAYS_COUNT; i++) {
-            days.add(new ForecastData(fioDaily.getDay(i)));
-        }
-        newForecastForCity.setDays(days);
+            FIO.getForecast(city.getLatitude(), city.getLongitude());
+            final ForecastData current = new ForecastData(new FIOCurrently(FIO).get());
+            DatabaseHelperFactory.getHelper().getForecastDataDAO().create(current);
+            newForecastForCity.setCurrent(current);
 
-        final FIOHourly fioHourly = new FIOHourly(FIO);
-        newForecastForCity.setHoursSummary(fioHourly.getHourly().summary());
-        List<ForecastData> hours = new ArrayList<ForecastData>(ForecastForCity.HOURS_COUNT);
-        for (int i = 0; i < ForecastForCity.HOURS_COUNT; i++) {
-            ForecastData[] hoursData = new ForecastData[ForecastForCity.HOURS_END_OFFSET[i] - ForecastForCity.HOURS_START_OFFSET[i]];
-            for (int j = ForecastForCity.HOURS_START_OFFSET[i]; j < ForecastForCity.HOURS_END_OFFSET[i]; j++) {
-                hoursData[j - ForecastForCity.HOURS_START_OFFSET[i]] = new ForecastData(fioHourly.getHour(j));
+            final FIODaily fioDaily = new FIODaily(FIO);
+            final FIOHourly fioHourly = new FIOHourly(FIO);
+
+            newForecastForCity.setDaysSummary(fioDaily.getDaily().summary());
+            newForecastForCity.setHoursSummary(fioHourly.getHourly().summary());
+
+            for (int i = 0; i < ForecastForCity.HOURS_COUNT; i++) {
+                ForecastData[] hoursData = new ForecastData[ForecastForCity.HOURS_END_OFFSET[i] - ForecastForCity.HOURS_START_OFFSET[i]];
+                for (int j = ForecastForCity.HOURS_START_OFFSET[i]; j < ForecastForCity.HOURS_END_OFFSET[i]; j++) {
+                    hoursData[j - ForecastForCity.HOURS_START_OFFSET[i]] = new ForecastData(fioHourly.getHour(j));
+                }
+                final ForecastData forecastData = new ForecastData(hoursData);
+                forecastData.setForecastForCity(newForecastForCity);
+                forecastData.setHour(true);
+                DatabaseHelperFactory.getHelper().getForecastDataDAO().create(forecastData);
             }
-            hours.add(new ForecastData(hoursData));
+
+            for (int i = 0; i < ForecastForCity.DAYS_COUNT; i++) {
+                final ForecastData forecastData = new ForecastData(fioDaily.getDay(i));
+                forecastData.setForecastForCity(newForecastForCity);
+                DatabaseHelperFactory.getHelper().getForecastDataDAO().create(forecastData);
+            }
+
+            DatabaseHelperFactory.getHelper().getForecastForCityDAO().update(newForecastForCity);
+            DatabaseHelperFactory.getHelper().getForecastForCityDAO().refresh(newForecastForCity);
+            return newForecastForCity;
+        } catch (SQLException e) {
+            Log.e(WeatherProvider.class.getName(), "Failed while loading forecast!");
+            throw new RuntimeException(e);
         }
-        return newForecastForCity;
     }
 
 }

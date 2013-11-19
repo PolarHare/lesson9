@@ -22,4 +22,6 @@
     <string name="NO_CITY_FOUND">No city was found!</string>
     <string name="SELECT_CITY">Select city:</string>
     <string name="CITY_NAME_EXAMPLE">Saint Petersburg, Russia</string>
+    <string name="NO_INTERNET_CONNECTION">No internet connetion!</string>
+    <string name="CITY">City:</string>
 </resources>

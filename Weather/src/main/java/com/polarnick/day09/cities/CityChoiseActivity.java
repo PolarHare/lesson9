@@ -1,9 +1,11 @@
 package com.polarnick.day09.cities;
 
+import android.app.ActionBar;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -25,7 +27,12 @@ public class CityChoiseActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ActionBar actionBar = getActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         final List<City> cities = (List<City>) getIntent().getExtras().get(CitiesManagementActivity.CITIES_LIST_EXTRA);
+        setListAdapter(new SimpleCityListAdapter(this, cities, Integer.MAX_VALUE));
         setListAdapter(new ArrayAdapter<City>(this, R.layout.city_to_choose_view, cities) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
@@ -38,6 +45,16 @@ public class CityChoiseActivity extends ListActivity {
                 return convertView;
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        if (menuItem.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override

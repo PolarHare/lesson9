@@ -1,10 +1,14 @@
 package com.polarnick.day09.entities;
 
+import com.google.common.base.Preconditions;
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -34,23 +38,19 @@ public class ForecastForCity {
     @DatabaseField()
     private String hoursSummary;
     @ForeignCollectionField(eager = true)
-    private Collection<ForecastData> hours;
+    private ForeignCollection<ForecastData> data;
     @DatabaseField()
     private String daysSummary;
-    @ForeignCollectionField(eager = true)
-    private Collection<ForecastData> days;
 
     public ForecastForCity() {
     }
 
-    public ForecastForCity(City city, long downloadedAt, ForecastData current, String hoursSummary, List<ForecastData> hours, String daysSummary, List<ForecastData> days) {
+    public ForecastForCity(City city, long downloadedAt, ForecastData current, String hoursSummary, String daysSummary) {
         this.city = city;
         this.downloadedAt = downloadedAt;
         this.current = current;
         this.hoursSummary = hoursSummary;
-        this.hours = hours;
         this.daysSummary = daysSummary;
-        this.days = days;
     }
 
     public int getId() {
@@ -93,14 +93,6 @@ public class ForecastForCity {
         this.hoursSummary = hoursSummary;
     }
 
-    public Collection<ForecastData> getHours() {
-        return hours;
-    }
-
-    public void setHours(List<ForecastData> hours) {
-        this.hours = hours;
-    }
-
     public String getDaysSummary() {
         return daysSummary;
     }
@@ -109,11 +101,49 @@ public class ForecastForCity {
         this.daysSummary = daysSummary;
     }
 
-    public Collection<ForecastData> getDays() {
+    public ForeignCollection<ForecastData> getData() {
+        return data;
+    }
+
+    public List<ForecastData> getHours() {
+        List<ForecastData> data = getDataSortedByTime();
+        List<ForecastData> hours = new ArrayList<ForecastData>(HOURS_COUNT);
+        for (int i = 0; i < HOURS_COUNT; i++) {
+            hours.add(data.get(i));
+        }
+        return hours;
+    }
+
+    public List<ForecastData> getDays() {
+        List<ForecastData> data = getDataSortedByTime();
+        List<ForecastData> days = new ArrayList<ForecastData>(DAYS_COUNT);
+        for (int i = HOURS_COUNT; i < HOURS_COUNT + DAYS_COUNT; i++) {
+            days.add(data.get(i));
+        }
         return days;
     }
 
-    public void setDays(List<ForecastData> days) {
-        this.days = days;
+    private List<ForecastData> getDataSortedByTime() {
+        ArrayList<ForecastData> dataArrayList = new ArrayList<ForecastData>(data);
+        Preconditions.checkState(dataArrayList.size() == DAYS_COUNT + HOURS_COUNT);
+        Collections.sort(dataArrayList, new Comparator<ForecastData>() {
+            @Override
+            public int compare(ForecastData forecast1, ForecastData forecast2) {
+                if (forecast1.isHour() && !forecast2.isHour()) {
+                    return -1;
+                }
+                if (!forecast1.isHour() && forecast2.isHour()) {
+                    return 1;
+                }
+                if (forecast1.getTime() > forecast2.getTime()) {
+                    return 1;
+                }
+                if (forecast1.getTime() < forecast2.getTime()) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
+        return dataArrayList;
     }
 }
