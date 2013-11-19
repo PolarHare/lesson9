@@ -20,6 +20,7 @@ public class ForecastData {
 
     private static final List<String> SUPPORTED_ICON_TYPES = Lists.newArrayList("clear-day", "clear-night", "rain", "snow",
             "sleet", "wind", "fog", "cloudy", "partly-cloudy-day", "partly-cloudy-night");
+    private static final List<String> SUPPORTED_PRECIP_TYPES = Lists.newArrayList("rain", "snow", "sleet");
     private static final String DEFAULT_ICON_TYPE = "cloudy";
 
     @DatabaseField(generatedId = true)
@@ -179,6 +180,9 @@ public class ForecastData {
     }
 
     public int getPrecipProbability() {
+        if (precipType == null && !SUPPORTED_PRECIP_TYPES.contains(iconType)) {
+            return 0;
+        }
         return precipProbability;
     }
 
@@ -187,6 +191,9 @@ public class ForecastData {
     }
 
     public double getPrecipIntensity() {
+        if (precipType == null && !SUPPORTED_PRECIP_TYPES.contains(iconType)) {
+            return 0;
+        }
         return precipIntensity;
     }
 
@@ -195,6 +202,13 @@ public class ForecastData {
     }
 
     public String getPrecipType() {
+        if (precipType == null) {
+            if (SUPPORTED_PRECIP_TYPES.contains(iconType)) {
+                return iconType;
+            } else {
+                return "null";
+            }
+        }
         return precipType;
     }
 

@@ -1,8 +1,14 @@
 package com.polarnick.day09;
 
+import android.R;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+
+import java.text.DateFormat;
+import java.util.Date;
 
 /**
  * Date: 18.11.13
@@ -10,6 +16,13 @@ import android.net.NetworkInfo;
  * @author Nickolay Polyarniy aka PolarNick
  */
 public class Utils {
+
+    public static int BIG_WEATHER_ICONS_WIDTH = 256;
+    public static String DEFIS = "—";
+
+    public static String formatTemperature(int temperature) {
+        return String.valueOf(temperature) + "°";
+    }
 
     public static boolean isOnline(Context context) {
         ConnectivityManager cm =
@@ -29,6 +42,31 @@ public class Utils {
         } else {
             return string;
         }
+    }
+
+    public static void addDivider(Context context, LinearLayout layout) {
+        ImageView divider = new ImageView(context);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 2);
+        params.setMargins(0, 8, 0, 8);
+        divider.setLayoutParams(params);
+        divider.setBackgroundColor(context.getResources().getColor(R.color.background_light));
+        layout.addView(divider);
+    }
+
+    public static String formatHoursRange(Date start, int hoursRange, DateFormat formatter) {
+        return formatter.format(start) + DEFIS + formatter.format(new Date(start.getTime() + hoursRange * 60L * 60 * 1000));
+    }
+
+    public static String roundToSignificantFigures(double num, int n) {
+        String result = String.valueOf(num);
+        int index = 0;
+        for (int i = 0; i < result.length(); i++) {
+            if (result.charAt(i) != '0' && result.charAt(i) != '-' && result.charAt(i) != '.') {
+                index = i;
+                break;
+            }
+        }
+        return result.substring(0, Math.min(index + n, result.length()));
     }
 
 }

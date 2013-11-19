@@ -22,6 +22,7 @@ public class ForecastForCity {
     public static final int HOURS_COUNT = 3;
     public static final int[] HOURS_START_OFFSET = new int[]{0, 1, 3};
     public static final int[] HOURS_END_OFFSET = new int[]{1, 3, 7};
+    public static final int[] HOURS_DIFF = new int[]{1, 2, 4};
 
     public static final int DAYS_COUNT = 7;
 

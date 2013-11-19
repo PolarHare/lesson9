@@ -2,4 +2,5 @@
 <resources>
     <dimen name="citiesNameSize">22dp</dimen>
     <dimen name="labelsTextSize">20dp</dimen>
+    <dimen name="todayTemperatureSize">30dp</dimen>
 </resources>

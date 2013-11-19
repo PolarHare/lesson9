@@ -89,8 +89,8 @@ public class WeatherActivity extends Activity {
 
             }
         });
+        citiesSpinner.setEnabled(cities.size() > 0);
         if (cities.size() == 0) {
-            citiesSpinner.setEnabled(false);
             selectedCity = null;
             showForecastForCity(selectedCity);
         }
@@ -125,14 +125,23 @@ public class WeatherActivity extends Activity {
         LinearLayout layoutForForecast = (LinearLayout) findViewById(R.id.forecastLayout);
         layoutForForecast.removeAllViews();
 
-        layoutForForecast.addView(new ForecastView(this, forecast.getCurrent()));
+        final TodayView todayView = new TodayView(this, forecast.getCurrent());
+        layoutForForecast.addView(todayView);
+        todayView.init();
+        Utils.addDivider(this, layoutForForecast);
 
         TextView hoursSummary = new TextView(this);
         hoursSummary.setText(forecast.getHoursSummary());
         layoutForForecast.addView(hoursSummary);
+        Utils.addDivider(this, layoutForForecast);
 
-        for (ForecastData data : forecast.getHours()) {
-            layoutForForecast.addView(new ForecastView(this, data));
+        List<ForecastData> hours = forecast.getHours();
+        for (int i = 0; i < hours.size(); i++) {
+            ForecastData data = hours.get(i);
+            final HourView hour = new HourView(this, ForecastForCity.HOURS_DIFF[i], data);
+            layoutForForecast.addView(hour);
+            hour.init();
+            Utils.addDivider(this, layoutForForecast);
         }
 
         TextView daysSummary = new TextView(this);
@@ -140,7 +149,10 @@ public class WeatherActivity extends Activity {
         layoutForForecast.addView(daysSummary);
 
         for (ForecastData data : forecast.getDays()) {
-            layoutForForecast.addView(new ForecastView(this, data));
+            Utils.addDivider(this, layoutForForecast);
+            final TodayView day = new TodayView(this, data);
+            layoutForForecast.addView(day);
+            day.init();
         }
     }
 
