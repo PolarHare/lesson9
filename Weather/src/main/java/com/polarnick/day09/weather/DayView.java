@@ -20,18 +20,16 @@ import java.util.Locale;
  *
  * @author Nickolay Polyarniy aka PolarNick
  */
-public class HourView extends RelativeLayout {
-    private static final DateFormat HOURS_FORMATTER = new SimpleDateFormat("HH:mm", Locale.UK);
+public class DayView extends RelativeLayout {
+    private static final DateFormat DAYS_FORMATTER = new SimpleDateFormat("EEE dd MMMM", Locale.UK);
 
     private final Context context;
     private final ForecastData forecast;
-    private final int hoursRange;
 
-    public HourView(Context context, int hoursRange, ForecastData forecast) {
+    public DayView(Context context, ForecastData forecast) {
         super(context);
         this.context = context;
         this.forecast = forecast;
-        this.hoursRange = hoursRange;
     }
 
     public void init() {
@@ -39,8 +37,8 @@ public class HourView extends RelativeLayout {
 
         TextView date = new TextView(context);
         date.setId(++lastId);
-        date.setText(Utils.formatHoursRange(new Date(forecast.getTime()), hoursRange, HOURS_FORMATTER));
-        date.setTextSize(getResources().getDimension(R.dimen.hourDate));
+        date.setText(DAYS_FORMATTER.format(new Date(forecast.getTime())));
+        date.setTextSize(getResources().getDimension(R.dimen.dayDate));
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         date.setLayoutParams(params);
         date.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -50,15 +48,15 @@ public class HourView extends RelativeLayout {
         mainImage.setId(++lastId);
         mainImage.setImageResource(getResources().getIdentifier(forecast.getIconType(), "drawable", context.getPackageName()));
         mainImage.setAdjustViewBounds(true);
-        params = new RelativeLayout.LayoutParams(getResources().getDimensionPixelSize(R.dimen.hourMainImageWidth), RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params = new RelativeLayout.LayoutParams(getResources().getDimensionPixelSize(R.dimen.dayMainImageWidth), RelativeLayout.LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.BELOW, date.getId());
         mainImage.setLayoutParams(params);
         addView(mainImage, params);
 
         TextView temperature = new TextView(context);
         temperature.setId(++lastId);
-        temperature.setText(" " + Utils.formatTemperature(forecast.getTemperature()));
-        temperature.setTextSize(getResources().getDimension(R.dimen.hourTemperature));
+        temperature.setText(" " + Utils.formatTemperature(forecast.getMaxTemperature()) + "... " + Utils.formatTemperature(forecast.getMinTemperature()));
+        temperature.setTextSize(getResources().getDimension(R.dimen.dayTemperature));
         params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.addRule(RIGHT_OF, mainImage.getId());
         params.addRule(ALIGN_TOP, mainImage.getId());
@@ -70,7 +68,7 @@ public class HourView extends RelativeLayout {
             windImage.setId(++lastId);
             windImage.setImageResource(R.drawable.small_wind);
             windImage.setAdjustViewBounds(true);
-            params = new LayoutParams(getResources().getDimensionPixelSize(R.dimen.hourWindIcon), getResources().getDimensionPixelSize(R.dimen.hourWindIcon));
+            params = new LayoutParams(getResources().getDimensionPixelSize(R.dimen.dayWindIcon), getResources().getDimensionPixelSize(R.dimen.dayWindIcon));
             params.addRule(BELOW, temperature.getId());
             params.addRule(RIGHT_OF, mainImage.getId());
             windImage.setLayoutParams(params);
@@ -79,7 +77,7 @@ public class HourView extends RelativeLayout {
             TextView windSpeed = new TextView(context);
             windSpeed.setId(++lastId);
             windSpeed.setText(" " + forecast.getWindSpeed() + " " + getResources().getString(R.string.WIND_SPEED_SUFFIX));
-            windSpeed.setTextSize(getResources().getDimension(R.dimen.hourWindSpeed));
+            windSpeed.setTextSize(getResources().getDimension(R.dimen.dayWindSpeed));
             params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.addRule(RIGHT_OF, windImage.getId());
             params.addRule(ALIGN_TOP, windImage.getId());
@@ -91,7 +89,7 @@ public class HourView extends RelativeLayout {
             windDirection.setImageResource(R.drawable.small_arrow_up);
             windDirection.setRotation(forecast.getWindBearing());
             windDirection.setAdjustViewBounds(true);
-            params = new LayoutParams(getResources().getDimensionPixelSize(R.dimen.hourWindVectorIcon), getResources().getDimensionPixelSize(R.dimen.hourWindVectorIcon));
+            params = new LayoutParams(getResources().getDimensionPixelSize(R.dimen.dayWindVectorIcon), getResources().getDimensionPixelSize(R.dimen.dayWindVectorIcon));
             params.addRule(RIGHT_OF, windSpeed.getId());
             params.addRule(ALIGN_TOP, windSpeed.getId());
             windDirection.setLayoutParams(params);
@@ -156,8 +154,8 @@ public class HourView extends RelativeLayout {
         TextView summary = new TextView(context);
         summary.setId(++lastId);
         summary.setText(forecast.getSummary());
-        summary.setTextSize(getResources().getDimension(R.dimen.hourSummary));
-//        summary.setMaxWidth(getResources().getDimensionPixelSize(R.dimen.hourSummaryWidth));
+        summary.setTextSize(getResources().getDimension(R.dimen.daySummary));
+//        summary.setMaxWidth(getResources().getDimensionPixelSize(R.dimen.daySummaryWidth));
         summary.setLayoutParams(params);
         addView(summary, params);
     }

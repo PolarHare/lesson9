@@ -1,9 +1,7 @@
 package com.polarnick.day09.weather;
 
 import android.content.Context;
-import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -24,7 +22,6 @@ import java.util.Locale;
  */
 public class TodayView extends RelativeLayout {
     private static final DateFormat TODAY_FORMATTER = new SimpleDateFormat("dd MMMM HH:mm", Locale.UK);
-    private static final DateFormat DAYS_FORMATTER = new SimpleDateFormat("dd MMM", Locale.UK);
 
     private final Context context;
     private final ForecastData forecast;
@@ -36,56 +33,92 @@ public class TodayView extends RelativeLayout {
     }
 
     public void init() {
+        int lastId = 0;
+
         TextView date = new TextView(context);
-        date.setId(1);
+        date.setId(++lastId);
         date.setText(TODAY_FORMATTER.format(new Date(forecast.getTime())));
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        date.setTextSize(getResources().getDimension(R.dimen.todayDate));
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         date.setLayoutParams(params);
         date.setGravity(Gravity.CENTER_HORIZONTAL);
         addView(date);
 
         ImageView mainImage = new ImageView(context);
-        mainImage.setId(2);
+        mainImage.setId(++lastId);
         mainImage.setImageResource(getResources().getIdentifier(forecast.getIconType(), "drawable", context.getPackageName()));
         mainImage.setAdjustViewBounds(true);
-        mainImage.setMaxWidth(Math.min(((View) this.getParent()).getWidth() / 2, Utils.BIG_WEATHER_ICONS_WIDTH));
-        params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params = new RelativeLayout.LayoutParams(getResources().getDimensionPixelSize(R.dimen.todayMainImageWidth), RelativeLayout.LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.BELOW, date.getId());
         mainImage.setLayoutParams(params);
         addView(mainImage, params);
 
         TextView temperature = new TextView(context);
-        temperature.setId(3);
-        temperature.setText(Utils.formatTemperature(forecast.getTemperature()));
-        temperature.setTextSize(getResources().getDimension(R.dimen.todayTemperatureSize));
+        temperature.setId(++lastId);
+        temperature.setText(" " + Utils.formatTemperature(forecast.getTemperature()));
+        temperature.setTextSize(getResources().getDimension(R.dimen.todayTemperature));
         params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.addRule(RIGHT_OF, mainImage.getId());
-        params.addRule(CENTER_VERTICAL, mainImage.getId());
+        params.addRule(ALIGN_BOTTOM, mainImage.getId());
         temperature.setLayoutParams(params);
         addView(temperature, params);
 
         TextView summary = new TextView(context);
-        summary.setId(4);
+        summary.setId(++lastId);
         summary.setText(forecast.getSummary());
+        summary.setTextSize(getResources().getDimension(R.dimen.todaySummary));
+//        summary.setMaxWidth(getResources().getDimensionPixelSize(R.dimen.todaySummaryWidth));
         params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.addRule(BELOW, mainImage.getId());
         summary.setLayoutParams(params);
         addView(summary, params);
 
+        if (forecast.getWindSpeed() > 0) {
+            ImageView windImage = new ImageView(context);
+            windImage.setId(++lastId);
+            windImage.setImageResource(R.drawable.small_wind);
+            windImage.setAdjustViewBounds(true);
+            params = new LayoutParams(getResources().getDimensionPixelSize(R.dimen.todayWindIcon), getResources().getDimensionPixelSize(R.dimen.todayWindIcon));
+            params.addRule(BELOW, summary.getId());
+            windImage.setLayoutParams(params);
+            addView(windImage);
+
+            TextView windSpeed = new TextView(context);
+            windSpeed.setId(++lastId);
+            windSpeed.setText(" " + forecast.getWindSpeed() + " " + getResources().getString(R.string.WIND_SPEED_SUFFIX));
+            windSpeed.setTextSize(getResources().getDimension(R.dimen.todayWindSpeed));
+            params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.addRule(RIGHT_OF, windImage.getId());
+            params.addRule(ALIGN_TOP, windImage.getId());
+            windSpeed.setLayoutParams(params);
+            addView(windSpeed);
+
+            ImageView windDirection = new ImageView(context);
+            windDirection.setId(++lastId);
+            windDirection.setImageResource(R.drawable.small_arrow_up);
+            windDirection.setRotation(forecast.getWindBearing());
+            windDirection.setAdjustViewBounds(true);
+            params = new LayoutParams(getResources().getDimensionPixelSize(R.dimen.todayWindVectorIcon), getResources().getDimensionPixelSize(R.dimen.todayWindVectorIcon));
+            params.addRule(RIGHT_OF, windSpeed.getId());
+            params.addRule(ALIGN_TOP, windSpeed.getId());
+            windDirection.setLayoutParams(params);
+            addView(windDirection);
+        }
+
         if (forecast.getPrecipIntensity() > 0) {
+            params = new LayoutParams(getResources().getDimensionPixelSize(R.dimen.precipIcon), getResources().getDimensionPixelSize(R.dimen.precipIcon));
+            params.addRule(BELOW, lastId);
             ImageView smallPrecipImage = new ImageView(context);
-            smallPrecipImage.setId(5);
+            smallPrecipImage.setId(++lastId);
             smallPrecipImage.setImageResource(getResources().getIdentifier("small_" + forecast.getPrecipType(), "drawable", context.getPackageName()));
             smallPrecipImage.setAdjustViewBounds(true);
-            params = new LayoutParams((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, getResources().getDisplayMetrics()),
-                    (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, getResources().getDisplayMetrics()));
-            params.addRule(BELOW, summary.getId());
             smallPrecipImage.setLayoutParams(params);
             addView(smallPrecipImage, params);
 
             TextView precipProbability = new TextView(context);
-            precipProbability.setId(6);
+            precipProbability.setId(++lastId);
             precipProbability.setText(" Probability " + Utils.DEFIS + " " + forecast.getPrecipProbability() + " ");
+            precipProbability.setTextSize(getResources().getDimension(R.dimen.precipProbability));
             params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.addRule(RIGHT_OF, smallPrecipImage.getId());
             params.addRule(ALIGN_TOP, smallPrecipImage.getId());
@@ -93,19 +126,19 @@ public class TodayView extends RelativeLayout {
             addView(precipProbability, params);
 
             ImageView probabilityImage = new ImageView(context);
-            probabilityImage.setId(7);
+            probabilityImage.setId(++lastId);
             probabilityImage.setImageResource(R.drawable.small_percentage);
             probabilityImage.setAdjustViewBounds(true);
-            params = new LayoutParams((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics()),
-                    (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics()));
+            params = new LayoutParams(getResources().getDimensionPixelSize(R.dimen.precipPercent), getResources().getDimensionPixelSize(R.dimen.precipPercent));
             params.addRule(RIGHT_OF, precipProbability.getId());
-            params.addRule(ALIGN_BOTTOM, precipProbability.getId());
+            params.addRule(ALIGN_TOP, precipProbability.getId());
             probabilityImage.setLayoutParams(params);
             addView(probabilityImage, params);
 
             TextView precipIntensity = new TextView(context);
-            precipIntensity.setId(8);
-            precipIntensity.setText(" Intencity " + Utils.DEFIS + " " +Utils.roundToSignificantFigures( forecast.getPrecipIntensity(),2) + " ");
+            precipIntensity.setId(++lastId);
+            precipIntensity.setText(" Intencity " + Utils.DEFIS + " " + Utils.roundToSignificantFigures(forecast.getPrecipIntensity(), 2) + " ");
+            precipIntensity.setTextSize(getResources().getDimension(R.dimen.precipIntencity));
             params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.addRule(RIGHT_OF, smallPrecipImage.getId());
             params.addRule(BELOW, precipProbability.getId());
@@ -113,13 +146,12 @@ public class TodayView extends RelativeLayout {
             addView(precipIntensity, params);
 
             ImageView intensityImage = new ImageView(context);
-            intensityImage.setId(9);
+            intensityImage.setId(++lastId);
             intensityImage.setImageResource(R.drawable.small_biceps);
             intensityImage.setAdjustViewBounds(true);
-            params = new LayoutParams((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics()),
-                    (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics()));
+            params = new LayoutParams(getResources().getDimensionPixelSize(R.dimen.precipBiceps), getResources().getDimensionPixelSize(R.dimen.precipBiceps));
             params.addRule(RIGHT_OF, precipIntensity.getId());
-            params.addRule(ALIGN_BOTTOM, precipIntensity.getId());
+            params.addRule(ALIGN_TOP, precipIntensity.getId());
             intensityImage.setLayoutParams(params);
             addView(intensityImage, params);
         }

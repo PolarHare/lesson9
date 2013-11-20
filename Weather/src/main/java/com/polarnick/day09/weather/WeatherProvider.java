@@ -26,18 +26,18 @@ public class WeatherProvider {
         FIO.setExcludeURL("minutely");
     }
 
-    public static synchronized ForecastForCity getForecastForCity(City city) {
+    public static synchronized ForecastForCity getForecastForCity(final City city) {
         try {
             ForecastForCity newForecastForCity = new ForecastForCity();
             DatabaseHelperFactory.getHelper().getForecastForCityDAO().create(newForecastForCity);
 
-            newForecastForCity.setCity(city);
             newForecastForCity.setDownloadedAt(System.currentTimeMillis());
 
             FIO.getForecast(city.getLatitude(), city.getLongitude());
             final ForecastData current = new ForecastData(new FIOCurrently(FIO).get());
             DatabaseHelperFactory.getHelper().getForecastDataDAO().create(current);
             newForecastForCity.setCurrent(current);
+            current.setForecastForCity(newForecastForCity);
 
             final FIODaily fioDaily = new FIODaily(FIO);
             final FIOHourly fioHourly = new FIOHourly(FIO);

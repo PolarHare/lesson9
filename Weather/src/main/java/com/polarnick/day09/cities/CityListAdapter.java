@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import com.j256.ormlite.misc.TransactionManager;
 import com.polarnick.day09.R;
 import com.polarnick.day09.dao.DatabaseHelperFactory;
 import com.polarnick.day09.entities.City;
@@ -16,6 +17,7 @@ import com.polarnick.day09.entities.ForecastForCity;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * Date: 18.11.13
@@ -34,18 +36,24 @@ public class CityListAdapter extends ArrayAdapter<City> {
         this.deleteCityListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                City city = (City) v.getTag();
+                final City city = (City) v.getTag();
                 try {
-                    ForecastForCity forecastForCity = city.getForecast();
-                    if (forecastForCity != null) {
-                        DatabaseHelperFactory.getHelper().getForecastForCityDAO().refresh(forecastForCity);
-                        DatabaseHelperFactory.getHelper().getForecastDataDAO().delete(forecastForCity.getCurrent());
-                        for (ForecastData forecastData : forecastForCity.getData()) {
-                            DatabaseHelperFactory.getHelper().getForecastDataDAO().delete(forecastData);
+                    TransactionManager.callInTransaction(DatabaseHelperFactory.getHelper().getConnectionSource(), new Callable<Void>() {
+                        @Override
+                        public Void call() throws Exception {
+                            ForecastForCity forecastForCity = city.getForecast();
+                            if (forecastForCity != null) {
+                                DatabaseHelperFactory.getHelper().getForecastForCityDAO().refresh(forecastForCity);
+                                DatabaseHelperFactory.getHelper().getForecastDataDAO().delete(forecastForCity.getCurrent());
+                                for (ForecastData forecastData : forecastForCity.getData()) {
+                                    DatabaseHelperFactory.getHelper().getForecastDataDAO().delete(forecastData);
+                                }
+                                DatabaseHelperFactory.getHelper().getForecastForCityDAO().delete(forecastForCity);
+                            }
+                            DatabaseHelperFactory.getHelper().getCityDAO().deleteById(city.getId());
+                            return null;
                         }
-                        DatabaseHelperFactory.getHelper().getForecastForCityDAO().delete(forecastForCity);
-                    }
-                    DatabaseHelperFactory.getHelper().getCityDAO().deleteById(city.getId());
+                    });
                 } catch (SQLException e) {
                     Log.e(CityListAdapter.class.getName(), "Deleting city with name=" + city.getName() + " and id=" + city.getId() + " failed!");
                     throw new RuntimeException(e);

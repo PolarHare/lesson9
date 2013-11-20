@@ -50,6 +50,15 @@ public class WeatherActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                Toast.makeText(WeatherActivity.this, "Forecast was updated!", Toast.LENGTH_SHORT);
+                for (City city : cities) {
+                    try {
+                        DatabaseHelperFactory.getHelper().getCityDAO().refresh(city);
+                    } catch (SQLException e) {
+                        Log.e(WeatherActivity.class.getName(), "Updating city with name=" + city.getName() + " and id=" + city.getId() + "!");
+                        throw new RuntimeException(e);
+                    }
+                }
                 showForecastForCity(selectedCity);
             }
         }, new IntentFilter(WeatherUpdaterService.FORECAST_UPDATE_TAG));
@@ -112,8 +121,10 @@ public class WeatherActivity extends Activity {
                 }
                 return;
             }
-            DatabaseHelperFactory.getHelper().getForecastForCityDAO().refresh(forecast);
-            DatabaseHelperFactory.getHelper().getForecastDataDAO().refresh(forecast.getCurrent());
+            if (forecast.getCurrent() == null) {
+                DatabaseHelperFactory.getHelper().getForecastForCityDAO().refresh(forecast);
+                DatabaseHelperFactory.getHelper().getForecastDataDAO().refresh(forecast.getCurrent());
+            }
             showForecast(forecast);
         } catch (SQLException e) {
             Log.e(WeatherActivity.class.getName(), "Updating city with name=" + city.getName() + " and id=" + city.getId() + "!");
@@ -125,34 +136,104 @@ public class WeatherActivity extends Activity {
         LinearLayout layoutForForecast = (LinearLayout) findViewById(R.id.forecastLayout);
         layoutForForecast.removeAllViews();
 
+        ScrollView scrollView = new ScrollView(this);
+        scrollView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        layoutForForecast.addView(scrollView);
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        scrollView.addView(layout);
+
         final TodayView todayView = new TodayView(this, forecast.getCurrent());
-        layoutForForecast.addView(todayView);
         todayView.init();
-        Utils.addDivider(this, layoutForForecast);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.CENTER;
+        todayView.setLayoutParams(params);
+        layout.addView(todayView);
+
+        Utils.addDivider(this, layout);
+
+        TextView hoursHeader = new TextView(this);
+        hoursHeader.setText("Hourly:");
+        hoursHeader.setTextSize(getResources().getDimension(R.dimen.hoursHeader));
+        params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.CENTER_HORIZONTAL;
+        hoursHeader.setLayoutParams(params);
+        layout.addView(hoursHeader);
 
         TextView hoursSummary = new TextView(this);
-        hoursSummary.setText(forecast.getHoursSummary());
-        layoutForForecast.addView(hoursSummary);
-        Utils.addDivider(this, layoutForForecast);
+        hoursSummary.setText(forecast.getDaysSummary());
+        hoursSummary.setTextSize(getResources().getDimension(R.dimen.hoursSummary));
+        params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.CENTER_HORIZONTAL;
+        hoursSummary.setLayoutParams(params);
+        layout.addView(hoursSummary);
+
+        Utils.addDivider(this, layout);
+
+        HorizontalScrollView hoursScroll = new HorizontalScrollView(this);
+        params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.CENTER_HORIZONTAL;
+        hoursScroll.setLayoutParams(params);
+        layout.addView(hoursScroll);
+
+        LinearLayout layoutForHours = new LinearLayout(this);
+        layoutForHours.setOrientation(LinearLayout.HORIZONTAL);
+        layoutForHours.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        hoursScroll.addView(layoutForHours);
 
         List<ForecastData> hours = forecast.getHours();
         for (int i = 0; i < hours.size(); i++) {
             ForecastData data = hours.get(i);
             final HourView hour = new HourView(this, ForecastForCity.HOURS_DIFF[i], data);
-            layoutForForecast.addView(hour);
+            layoutForHours.addView(hour);
             hour.init();
-            Utils.addDivider(this, layoutForForecast);
+            if (i != hours.size()) {
+                Utils.addVerticalDivider(this, layoutForHours);
+            }
         }
+
+        Utils.addDivider(this, layout);
+
+        TextView daysHeader = new TextView(this);
+        daysHeader.setText("Daily:");
+        daysHeader.setTextSize(getResources().getDimension(R.dimen.daysHeader));
+        params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.CENTER_HORIZONTAL;
+        daysHeader.setLayoutParams(params);
+        layout.addView(daysHeader);
 
         TextView daysSummary = new TextView(this);
         daysSummary.setText(forecast.getDaysSummary());
-        layoutForForecast.addView(daysSummary);
+        daysSummary.setTextSize(getResources().getDimension(R.dimen.daysSummary));
+        params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.CENTER_HORIZONTAL;
+        daysSummary.setLayoutParams(params);
+        layout.addView(daysSummary);
 
-        for (ForecastData data : forecast.getDays()) {
-            Utils.addDivider(this, layoutForForecast);
-            final TodayView day = new TodayView(this, data);
-            layoutForForecast.addView(day);
+        Utils.addDivider(this, layout);
+
+        HorizontalScrollView daysScroll = new HorizontalScrollView(this);
+        params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.CENTER_HORIZONTAL;
+        daysScroll.setLayoutParams(params);
+        layout.addView(daysScroll);
+
+        LinearLayout layoutForDays = new LinearLayout(this);
+        layoutForDays.setOrientation(LinearLayout.HORIZONTAL);
+        layoutForDays.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        daysScroll.addView(layoutForDays);
+
+        List<ForecastData> days = forecast.getDays();
+        for (int i = 0; i < days.size(); i++) {
+            ForecastData data = days.get(i);
+            final DayView day = new DayView(this, data);
+            layoutForDays.addView(day);
             day.init();
+            if (i != days.size()) {
+                Utils.addVerticalDivider(this, layoutForDays);
+            }
         }
     }
 

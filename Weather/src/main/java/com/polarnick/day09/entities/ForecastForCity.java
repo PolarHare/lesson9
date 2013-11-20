@@ -29,9 +29,6 @@ public class ForecastForCity {
     @DatabaseField(generatedId = true)
     private int id;
 
-    @DatabaseField(foreign = true)
-    private City city;
-
     @DatabaseField()
     private long downloadedAt;
     @DatabaseField(foreign = true)
@@ -46,8 +43,7 @@ public class ForecastForCity {
     public ForecastForCity() {
     }
 
-    public ForecastForCity(City city, long downloadedAt, ForecastData current, String hoursSummary, String daysSummary) {
-        this.city = city;
+    public ForecastForCity(long downloadedAt, ForecastData current, String hoursSummary, String daysSummary) {
         this.downloadedAt = downloadedAt;
         this.current = current;
         this.hoursSummary = hoursSummary;
@@ -60,14 +56,6 @@ public class ForecastForCity {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public City getCity() {
-        return city;
-    }
-
-    public void setCity(City city) {
-        this.city = city;
     }
 
     public long getDownloadedAt() {

@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import com.j256.ormlite.misc.TransactionManager;
+import com.polarnick.day09.Utils;
 import com.polarnick.day09.dao.DatabaseHelperFactory;
 import com.polarnick.day09.entities.City;
 import com.polarnick.day09.entities.ForecastData;
@@ -14,6 +16,7 @@ import com.polarnick.day09.entities.ForecastForCity;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * Date: 19.11.13
@@ -39,13 +42,17 @@ public class WeatherUpdaterService extends IntentService {
             Log.i(WeatherUpdaterService.class.getName(), "Updating forecast for " + cities.size() + " cities...");
 
             boolean somethingWasUpdated = false;
-            for (City city : cities) {
-                ForecastForCity forecast = WeatherProvider.getForecastForCity(city);
-                if (forecast != null) {
-                    Log.i(WeatherUpdaterService.class.getName(), "Forecast downloading was success for city with name=" + city.getName() + " and id=" + city.getId() + "!");
-                    somethingWasUpdated = updateForecastForCity(city, forecast);
-                } else {
-                    Log.i(WeatherUpdaterService.class.getName(), "Forecast downloading was failed for city with name=" + city.getName() + " and id=" + city.getId() + "!");
+            if (Utils.isOnline(getApplicationContext())) {
+                for (City city : cities) {
+                    if (Utils.isOnline(getApplicationContext())) {
+                        ForecastForCity forecast = WeatherProvider.getForecastForCity(city);
+                        if (forecast != null) {
+                            Log.i(WeatherUpdaterService.class.getName(), "Forecast downloading was success for city with name=" + city.getName() + " and id=" + city.getId() + "!");
+                            somethingWasUpdated = updateForecastForCity(city, forecast);
+                        } else {
+                            Log.i(WeatherUpdaterService.class.getName(), "Forecast downloading was failed for city with name=" + city.getName() + " and id=" + city.getId() + "!");
+                        }
+                    }
                 }
             }
 
@@ -58,15 +65,21 @@ public class WeatherUpdaterService extends IntentService {
         scheduleNextUpdate(intent);
     }
 
-    private boolean updateForecastForCity(City city, ForecastForCity forecast) {
-        ForecastForCity oldForecast = city.getForecast();
+    private boolean updateForecastForCity(final City city, final ForecastForCity forecast) {
+        final ForecastForCity oldForecast = city.getForecast();
         try {
-            city.setForecast(forecast);
-            DatabaseHelperFactory.getHelper().getCityDAO().update(city);
-            if (oldForecast != null) {
-                DatabaseHelperFactory.getHelper().getForecastForCityDAO().refresh(oldForecast);
-                deleteForecast(oldForecast);
-            }
+            TransactionManager.callInTransaction(DatabaseHelperFactory.getHelper().getConnectionSource(), new Callable<Void>() {
+                @Override
+                public Void call() throws Exception {
+                    city.setForecast(forecast);
+                    DatabaseHelperFactory.getHelper().getCityDAO().update(city);
+                    if (oldForecast != null) {
+                        DatabaseHelperFactory.getHelper().getForecastForCityDAO().refresh(oldForecast);
+                        deleteForecast(oldForecast);
+                    }
+                    return null;
+                }
+            });
             return true;
         } catch (SQLException e) {
             if (oldForecast != null) {
@@ -80,7 +93,7 @@ public class WeatherUpdaterService extends IntentService {
         }
     }
 
-    private void deleteForecast(ForecastForCity oldForecast) throws SQLException {
+    private void deleteForecast(final ForecastForCity oldForecast) throws SQLException {
         DatabaseHelperFactory.getHelper().getForecastDataDAO().deleteById(oldForecast.getCurrent().getId());
         for (ForecastData forecastData : oldForecast.getData()) {
             DatabaseHelperFactory.getHelper().getForecastDataDAO().deleteById(forecastData.getId());

@@ -21,7 +21,7 @@ public class Utils {
     public static String DEFIS = "—";
 
     public static String formatTemperature(int temperature) {
-        return String.valueOf(temperature) + "°";
+        return ((temperature > 0) ? "+" : "") + String.valueOf(temperature) + "°";
     }
 
     public static boolean isOnline(Context context) {
@@ -46,10 +46,19 @@ public class Utils {
 
     public static void addDivider(Context context, LinearLayout layout) {
         ImageView divider = new ImageView(context);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 2);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1);
         params.setMargins(0, 8, 0, 8);
         divider.setLayoutParams(params);
-        divider.setBackgroundColor(context.getResources().getColor(R.color.background_light));
+        divider.setBackgroundColor(context.getResources().getColor(R.color.background_dark));
+        layout.addView(divider);
+    }
+
+    public static void addVerticalDivider(Context context, LinearLayout layout) {
+        ImageView divider = new ImageView(context);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(1, LinearLayout.LayoutParams.MATCH_PARENT);
+        params.setMargins(8, 0, 8, 0);
+        divider.setLayoutParams(params);
+        divider.setBackgroundColor(context.getResources().getColor(R.color.background_dark));
         layout.addView(divider);
     }
 
