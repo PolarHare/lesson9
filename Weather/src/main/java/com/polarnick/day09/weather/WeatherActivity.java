@@ -32,6 +32,7 @@ public class WeatherActivity extends Activity {
     private static final String WEATHER_PREFERENCES = "weatherPreferences";
     private static final String SELECTED_CITY_INDEX = "selectedCity";
 
+    private Toast feedWasUpdatedToast;
     private List<City> cities;
     private City selectedCity;
     private int selectedCityIndex = -1;
@@ -39,6 +40,7 @@ public class WeatherActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        feedWasUpdatedToast = Toast.makeText(WeatherActivity.this, "Forecast was updated!", Toast.LENGTH_SHORT);
         setContentView(R.layout.forecast_main);
 
         SharedPreferences settings = getSharedPreferences(WEATHER_PREFERENCES, 0);
@@ -55,7 +57,7 @@ public class WeatherActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Toast.makeText(WeatherActivity.this, "Forecast was updated!", Toast.LENGTH_SHORT).show();
+                feedWasUpdatedToast.show();
                 for (City city : cities) {
                     try {
                         DatabaseHelperFactory.getHelper().getCityDAO().refresh(city);
