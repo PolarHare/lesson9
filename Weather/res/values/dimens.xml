@@ -36,6 +36,7 @@
     <dimen name="precipIntencity">13dp</dimen>
     <dimen name="precipBiceps">22dp</dimen>
 
+    <dimen name="todayHeader">22dp</dimen>
     <dimen name="hoursHeader">20dp</dimen>
     <dimen name="daysHeader">20dp</dimen>
     <dimen name="hoursSummary">15dp</dimen>

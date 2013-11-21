@@ -31,6 +31,8 @@ public class CityChoiseActivity extends ListActivity {
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+        setContentView(R.layout.city_choise);
+
         final List<City> cities = (List<City>) getIntent().getExtras().get(CitiesManagementActivity.CITIES_LIST_EXTRA);
         setListAdapter(new SimpleCityListAdapter(this, cities, Integer.MAX_VALUE));
         setListAdapter(new ArrayAdapter<City>(this, R.layout.city_to_choose_view, cities) {

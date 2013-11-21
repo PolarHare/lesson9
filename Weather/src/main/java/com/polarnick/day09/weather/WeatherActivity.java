@@ -50,7 +50,7 @@ public class WeatherActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Toast.makeText(WeatherActivity.this, "Forecast was updated!", Toast.LENGTH_SHORT);
+                Toast.makeText(WeatherActivity.this, "Forecast was updated!", Toast.LENGTH_SHORT).show();
                 for (City city : cities) {
                     try {
                         DatabaseHelperFactory.getHelper().getCityDAO().refresh(city);
@@ -108,7 +108,12 @@ public class WeatherActivity extends Activity {
     private void showForecastForCity(City city) {
         try {
             if (city == null) {
-                showMessage("Please add city!");
+                showMessage("Please add city!").setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(new Intent(WeatherActivity.this, CitiesManagementActivity.class));
+                    }
+                });
                 return;
             }
             DatabaseHelperFactory.getHelper().getCityDAO().refresh(city);
@@ -145,9 +150,21 @@ public class WeatherActivity extends Activity {
         layout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         scrollView.addView(layout);
 
+        LinearLayout.LayoutParams params;
+
+        if (System.currentTimeMillis() - forecast.getCurrent().getTime() < 1L * 60 * 60 * 1000) {
+            TextView todayHeader = new TextView(this);
+            todayHeader.setText("Now:");
+            todayHeader.setTextSize(getResources().getDimension(R.dimen.todayHeader));
+            params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.gravity = Gravity.CENTER_HORIZONTAL;
+            todayHeader.setLayoutParams(params);
+            layout.addView(todayHeader);
+        }
+
         final TodayView todayView = new TodayView(this, forecast.getCurrent());
         todayView.init();
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.gravity = Gravity.CENTER;
         todayView.setLayoutParams(params);
         layout.addView(todayView);
@@ -163,7 +180,7 @@ public class WeatherActivity extends Activity {
         layout.addView(hoursHeader);
 
         TextView hoursSummary = new TextView(this);
-        hoursSummary.setText(forecast.getDaysSummary());
+        hoursSummary.setText(forecast.getHoursSummary());
         hoursSummary.setTextSize(getResources().getDimension(R.dimen.hoursSummary));
         params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.gravity = Gravity.CENTER_HORIZONTAL;
@@ -189,7 +206,7 @@ public class WeatherActivity extends Activity {
             final HourView hour = new HourView(this, ForecastForCity.HOURS_DIFF[i], data);
             layoutForHours.addView(hour);
             hour.init();
-            if (i != hours.size()) {
+            if (i != hours.size() - 1) {
                 Utils.addVerticalDivider(this, layoutForHours);
             }
         }
@@ -231,7 +248,7 @@ public class WeatherActivity extends Activity {
             final DayView day = new DayView(this, data);
             layoutForDays.addView(day);
             day.init();
-            if (i != days.size()) {
+            if (i != days.size() - 1) {
                 Utils.addVerticalDivider(this, layoutForDays);
             }
         }
@@ -264,7 +281,7 @@ public class WeatherActivity extends Activity {
         layoutForForecast.addView(layout1);
     }
 
-    private void showMessage(String message) {
+    private TextView showMessage(String message) {
         LinearLayout layoutForForecast = (LinearLayout) findViewById(R.id.forecastLayout);
         layoutForForecast.removeAllViews();
 
@@ -274,5 +291,6 @@ public class WeatherActivity extends Activity {
         messageView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         messageView.setGravity(Gravity.CENTER);
         layoutForForecast.addView(messageView);
+        return messageView;
     }
 }

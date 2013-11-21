@@ -75,6 +75,7 @@ public class CityListAdapter extends ArrayAdapter<City> {
         final ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.deleteCityButton);
         deleteButton.setOnClickListener(deleteCityListener);
         deleteButton.setTag(cities.get(position));
+        deleteButton.setFocusable(false);
         return convertView;
     }
 }

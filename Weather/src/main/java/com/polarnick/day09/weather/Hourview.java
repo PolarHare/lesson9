@@ -65,6 +65,7 @@ public class HourView extends RelativeLayout {
         temperature.setLayoutParams(params);
         addView(temperature, params);
 
+        int precipImageId = -1;
         if (forecast.getWindSpeed() > 0) {
             ImageView windImage = new ImageView(context);
             windImage.setId(++lastId);
@@ -108,10 +109,11 @@ public class HourView extends RelativeLayout {
             smallPrecipImage.setAdjustViewBounds(true);
             smallPrecipImage.setLayoutParams(params);
             addView(smallPrecipImage, params);
+            precipImageId = smallPrecipImage.getId();
 
             TextView precipProbability = new TextView(context);
             precipProbability.setId(++lastId);
-            precipProbability.setText(" " + Utils.DEFIS + " " + forecast.getPrecipProbability() + " ");
+            precipProbability.setText(" " + Utils.DEFIS + " " + forecast.getPrecipProbability() + " %");
             precipProbability.setTextSize(getResources().getDimension(R.dimen.precipProbability));
             params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.addRule(RIGHT_OF, smallPrecipImage.getId());
@@ -119,39 +121,22 @@ public class HourView extends RelativeLayout {
             precipProbability.setLayoutParams(params);
             addView(precipProbability, params);
 
-            ImageView probabilityImage = new ImageView(context);
-            probabilityImage.setId(++lastId);
-            probabilityImage.setImageResource(R.drawable.small_percentage);
-            probabilityImage.setAdjustViewBounds(true);
-            params = new LayoutParams(getResources().getDimensionPixelSize(R.dimen.precipPercent), getResources().getDimensionPixelSize(R.dimen.precipPercent));
-            params.addRule(RIGHT_OF, precipProbability.getId());
-            params.addRule(ALIGN_TOP, precipProbability.getId());
-            probabilityImage.setLayoutParams(params);
-            addView(probabilityImage, params);
-
             TextView precipIntensity = new TextView(context);
             precipIntensity.setId(++lastId);
-            precipIntensity.setText(" " + Utils.DEFIS + " " + Utils.roundToSignificantFigures(forecast.getPrecipIntensity(), 2) + " ");
+            precipIntensity.setText(" " + Utils.DEFIS + " " + Utils.roundToSignificantFigures(forecast.getPrecipIntensity(), 2) + " mm/h");
             precipIntensity.setTextSize(getResources().getDimension(R.dimen.precipIntencity));
             params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.addRule(RIGHT_OF, smallPrecipImage.getId());
             params.addRule(BELOW, precipProbability.getId());
             precipIntensity.setLayoutParams(params);
             addView(precipIntensity, params);
-
-            ImageView intensityImage = new ImageView(context);
-            intensityImage.setId(++lastId);
-            intensityImage.setImageResource(R.drawable.small_biceps);
-            intensityImage.setAdjustViewBounds(true);
-            params = new LayoutParams(getResources().getDimensionPixelSize(R.dimen.precipBiceps), getResources().getDimensionPixelSize(R.dimen.precipBiceps));
-            params.addRule(RIGHT_OF, precipIntensity.getId());
-            params.addRule(ALIGN_TOP, precipIntensity.getId());
-            intensityImage.setLayoutParams(params);
-            addView(intensityImage, params);
         }
 
         params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.addRule(BELOW, mainImage.getId());
+        if (precipImageId != -1) {
+            params.addRule(BELOW, precipImageId);
+        }
         params.addRule(BELOW, lastId);
         TextView summary = new TextView(context);
         summary.setId(++lastId);

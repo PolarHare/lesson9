@@ -43,6 +43,12 @@ public class CitiesManagementActivity extends Activity {
         ListView citiesListView = (ListView) findViewById(R.id.listOfCities);
         citiesList = DatabaseHelperFactory.getHelper().getCityDAO().getAllCities();
         citiesListAdapter = new CityListAdapter(this, citiesList);
+        citiesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                finish();
+            }
+        });
         citiesListView.setAdapter(citiesListAdapter);
 
         EditText cityToAdd = (EditText) findViewById(R.id.nameOfCityToAdd);

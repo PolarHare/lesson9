@@ -31,20 +31,6 @@
                   android:layout_weight="1"
                   android:id="@+id/forecastLayout"
                   android:orientation="vertical">
-        <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:layout_gravity="center_horizontal">
-            <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="New Button"
-                    android:id="@+id/button"/>
-        </RelativeLayout>
-        <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="New Button"
-                android:id="@+id/button1"/>
     </LinearLayout>
 
 </LinearLayout>

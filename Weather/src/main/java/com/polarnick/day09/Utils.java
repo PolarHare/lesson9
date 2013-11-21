@@ -49,7 +49,7 @@ public class Utils {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1);
         params.setMargins(0, 8, 0, 8);
         divider.setLayoutParams(params);
-        divider.setBackgroundColor(context.getResources().getColor(R.color.background_dark));
+        divider.setBackgroundColor(context.getResources().getColor(R.color.darker_gray));
         layout.addView(divider);
     }
 
@@ -58,7 +58,7 @@ public class Utils {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(1, LinearLayout.LayoutParams.MATCH_PARENT);
         params.setMargins(8, 0, 8, 0);
         divider.setLayoutParams(params);
-        divider.setBackgroundColor(context.getResources().getColor(R.color.background_dark));
+        divider.setBackgroundColor(context.getResources().getColor(R.color.darker_gray));
         layout.addView(divider);
     }
 

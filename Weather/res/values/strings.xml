@@ -25,4 +25,5 @@
     <string name="NO_INTERNET_CONNECTION">No internet connetion!</string>
     <string name="CITY">City:</string>
     <string name="WIND_SPEED_SUFFIX">m/s</string>
+    <string name="ENTER_CITY_NAME">Enter city name:</string>
 </resources>
