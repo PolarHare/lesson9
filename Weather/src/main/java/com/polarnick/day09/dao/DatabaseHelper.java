@@ -21,7 +21,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     private static final String DATABASE_NAME = "forecasts.db";
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 239;
 
     private CityDAO cityDAO = null;
     private ForecastForCityDAO forecastForCityDAO = null;
