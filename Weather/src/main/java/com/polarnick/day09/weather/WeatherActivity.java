@@ -1,10 +1,7 @@
 package com.polarnick.day09.weather;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.*;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -31,13 +28,20 @@ import java.util.List;
  */
 public class WeatherActivity extends Activity {
 
+    private static final String WEATHER_PREFERENCES = "weatherPreferences";
+    private static final String SELECTED_CITY_INDEX = "selectedCity";
+
     private List<City> cities;
     private City selectedCity;
+    private int selectedCityIndex = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.forecast_main);
+
+        SharedPreferences settings = getSharedPreferences(WEATHER_PREFERENCES, 0);
+        selectedCityIndex = settings.getInt(SELECTED_CITY_INDEX, -1);
 
         ImageButton configureCities = (ImageButton) findViewById(R.id.configureCities);
         configureCities.setOnClickListener(new View.OnClickListener() {
@@ -73,6 +77,15 @@ public class WeatherActivity extends Activity {
         startWeatherUpdaterService();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        SharedPreferences settings = getSharedPreferences(WEATHER_PREFERENCES, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt(SELECTED_CITY_INDEX, selectedCityIndex);
+        editor.commit();
+    }
+
     private void startWeatherUpdaterService() {
         Intent intent = new Intent(WeatherActivity.this, WeatherUpdaterService.class);
         startService(intent);
@@ -86,9 +99,13 @@ public class WeatherActivity extends Activity {
         Spinner citiesSpinner = (Spinner) findViewById(R.id.citiesSpinner);
         final SimpleCityListAdapter adapter = new SimpleCityListAdapter(this, cities, 16);
         citiesSpinner.setAdapter(adapter);
+        if (cities.size() > selectedCityIndex && selectedCityIndex != -1) {
+            citiesSpinner.setSelection(selectedCityIndex);
+        }
         citiesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedCityIndex = position;
                 selectedCity = cities.get(position);
                 showForecastForCity(selectedCity);
             }
@@ -100,6 +117,7 @@ public class WeatherActivity extends Activity {
         });
         citiesSpinner.setEnabled(cities.size() > 0);
         if (cities.size() == 0) {
+            selectedCityIndex = -1;
             selectedCity = null;
             showForecastForCity(selectedCity);
         }
