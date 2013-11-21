@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
@@ -207,7 +208,7 @@ public class WeatherActivity extends Activity {
 
         Utils.addDivider(this, layout);
 
-        HorizontalScrollView hoursScroll = new HorizontalScrollView(this);
+        final HorizontalScrollView hoursScroll = new HorizontalScrollView(this);
         params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.gravity = Gravity.CENTER_HORIZONTAL;
         hoursScroll.setLayoutParams(params);
@@ -249,7 +250,7 @@ public class WeatherActivity extends Activity {
 
         Utils.addDivider(this, layout);
 
-        HorizontalScrollView daysScroll = new HorizontalScrollView(this);
+        final HorizontalScrollView daysScroll = new HorizontalScrollView(this);
         params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.gravity = Gravity.CENTER_HORIZONTAL;
         daysScroll.setLayoutParams(params);
@@ -270,6 +271,31 @@ public class WeatherActivity extends Activity {
                 Utils.addVerticalDivider(this, layoutForDays);
             }
         }
+
+        scrollView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                daysScroll.getParent().requestDisallowInterceptTouchEvent(false);
+                hoursScroll.getParent().requestDisallowInterceptTouchEvent(false);
+                return false;
+            }
+        });
+
+        daysScroll.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+                return false;
+            }
+        });
+
+        hoursScroll.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+                return false;
+            }
+        });
     }
 
     private void showRefreshingProgress(String message) {
